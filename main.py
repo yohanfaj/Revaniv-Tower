@@ -39,6 +39,7 @@ player = pygame.image.load("mario.png")
 playerRect = pygame.Rect(50, 500, 50, 50)
 baddie = pygame.image.load(("goomba.png"))
 badRect = pygame.Rect(500, 500, 50, 50)
+plat1 = pygame.Rect(100, 450, 400, 10)
 bg = pygame.image.load("map_cantine.jpeg")
 
 # Set up music.
@@ -70,6 +71,7 @@ def redrawScreen():
     windowSurface.blit(bg, (0, 0))
     windowSurface.blit(player, playerRect)
     windowSurface.blit(baddie, badRect)
+    pygame.draw.rect(windowSurface, WHITE, plat1)
     drawText('Health: %s' % (HEALTH), font, windowSurface, 10, 10)
     drawText("Bonus Score: %s" % (BONUS), font, windowSurface, 10, 45)
     pygame.display.flip()
@@ -179,6 +181,7 @@ while running:
             badRect.x = -4
             badRect -= BADDIEMOVERATE
 
+        # Collision Player - Obstacle
         if playerRect.colliderect(badRect):
             mixer.music.stop()
             HitSound.play()
@@ -189,6 +192,12 @@ while running:
             mixer.music.play(-1, 0.0)
             HEALTH -= 1
             BONUS = 5000
+
+        # Collision Player - Platform
+        if playerRect.colliderect(plat1):
+            playerRect.y = plat1.top
+            PLAYERMOVERATE_Y = 0
+
 
         if HEALTH == 0:
             mixer.music.load('gameover.wav')
