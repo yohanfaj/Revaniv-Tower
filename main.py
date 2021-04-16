@@ -1,6 +1,7 @@
 import pygame, sys, time
 from pygame.locals import *
 from pygame import mixer
+from time import sleep
 
 WINDOWWIDTH = 600
 WINDOWHEIGHT = 600
@@ -22,6 +23,14 @@ BONUS = 5000
 bonus_cpt = 0
 isJump = False
 
+# Plateform
+P1_X = 50
+P1_Y = 440
+P1_LX = 200
+P_Y = 10
+P1 = pygame.Rect(P1_X, P1_Y, P1_LX, P_Y)
+isOnP1 = False
+
 # Set up pygame, the window, and the mouse cursor.
 pygame.init()
 mainClock = pygame.time.Clock()
@@ -32,15 +41,36 @@ pygame.mouse.set_visible(True)
 # Set up the fonts.
 font = pygame.font.Font('fette-unz-fraktur.ttf', 30)
 
+
 # Set up images.
+
+
+class Spritesheet:
+    def __init__(self, filename):
+        self.filename = filename
+        self.sprite_sheet = pygame.image.load(filename).convert()
+
+    def get_sprite(self, x, y, w, h):
+        sprite = pygame.Surface((w, h))
+        sprite.set_colorkey((0, 0, 0))
+        sprite.blit(self.sprite_sheet, (0, 0), (x, y, w, h))
+        return sprite
+
+
 StartScreen = pygame.image.load("main_menu.png")
 logo = pygame.image.load('logoicon.ico')
-player = pygame.image.load("mario.png")
-playerRect = pygame.Rect(50, 500, 50, 50)
-baddie = pygame.image.load(("goomba.png"))
-badRect = pygame.Rect(500, 500, 50, 50)
-plat1 = pygame.Rect(100, 450, 400, 10)
-bg = pygame.image.load("map_cantine.jpeg")
+player = pygame.image.load("core_character_right_1.png")
+player_2 = pygame.image.load("core_character_left.png")
+run_right_list = [pygame.image.load("core_character_run_right_1.png"),
+                  pygame.image.load("core_character_run_right_2.png"),
+                  pygame.image.load("core_character_run_right_3.png"),
+                  pygame.image.load("core_character_run_right_4.png"),
+                  pygame.image.load("core_character_run_right_5.png"),
+                  pygame.image.load("core_character_run_right_6.png")]
+playerRect = pygame.Rect(50, 480, 60, 60)
+baddie = pygame.image.load(("skin_sorcier_revaniv.png"))
+badRect = pygame.Rect(500, 480, 50, 50)
+bg = pygame.image.load("map_cantine.png")
 
 # Set up music.
 StartJingle = mixer.Sound("StartJingle.wav")
@@ -71,7 +101,7 @@ def redrawScreen():
     windowSurface.blit(bg, (0, 0))
     windowSurface.blit(player, playerRect)
     windowSurface.blit(baddie, badRect)
-    pygame.draw.rect(windowSurface, WHITE, plat1)
+    pygame.draw.rect(windowSurface, BLUE, P1)
     drawText('Health: %s' % (HEALTH), font, windowSurface, 10, 10)
     drawText("Bonus Score: %s" % (BONUS), font, windowSurface, 10, 45)
     pygame.display.flip()
@@ -79,7 +109,7 @@ def redrawScreen():
 
 
 def y_trajectory(y_basis, y_speed, t):
-    y = y_basis - (-9.81 * t ** 2 / 2 + y_speed * t)
+    y = y_basis - ((-9.81 / 25) * t ** 2 / 2 + y_speed * t)
     return y
 
 
@@ -88,7 +118,6 @@ def drawText(text, font, surface, x, y):
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
-
 
 
 # Set up the Start screen of the game:
@@ -101,6 +130,7 @@ musicPlaying = True
 running = True
 
 while running:
+
     moveLeft = moveRight = False
     badLeft = True
     badRight = False
@@ -116,12 +146,20 @@ while running:
                 if event.key == K_LEFT or event.key == K_a:
                     moveRight = False
                     moveLeft = True
+                    player = pygame.image.load("core_character_run_left.png")
                 if event.key == K_RIGHT or event.key == K_d:
                     moveLeft = False
                     moveRight = True
-
+                    player = run_right_list[0]
                 if event.key == K_SPACE and isJump == False:
+                    if event.key == K_LEFT or event.key == K_a:
+                        player = pygame.image.load("core_character_jump_left.png")
+                    elif event.key == K_RIGHT or event.key == K_d:
+                        player = pygame.image.load("core_character_jump_right.png")
                     isJump = True
+                    t = 0
+                    y_basis = playerRect.y
+                    y_speed = PLAYERMOVERATE_Y
 
                     # OLD VERSION :
                     # y_basis = playerRect.y
@@ -143,8 +181,10 @@ while running:
 
                 if event.key == K_LEFT or event.key == K_a:
                     moveLeft = False
+                    player = pygame.image.load("core_character_left.png")
                 if event.key == K_RIGHT or event.key == K_d:
                     moveRight = False
+                    player = pygame.image.load("core_character_right_1.png")
 
                 if event.key == K_m:
                     if musicPlaying:
@@ -159,12 +199,39 @@ while running:
         if moveRight and playerRect.right < WINDOWWIDTH:
             playerRect.right += PLAYERMOVERATE_X
 
-        if isJump is True:
-            playerRect.y -= PLAYERMOVERATE_Y * 2
-            PLAYERMOVERATE_Y -= 1
-            if PLAYERMOVERATE_Y < -10:
+        # if isJump is True:
+        #    playerRect.y -= PLAYERMOVERATE_Y * 2
+        #    PLAYERMOVERATE_Y -= 1
+        #    if PLAYERMOVERATE_Y < -10:
+        #        isJump = False
+        #        PLAYERMOVERATE_Y = 10
+
+        if not (playerRect.x > P1_X and playerRect.x < P1_X + P1_LX) and isOnP1 and not isJump:
+            isOnP1 = False
+            isJump = True
+            t = 0
+            y_basis = P1_Y - 60
+            y_speed = 0
+
+        if isJump:
+            if playerRect.y > 485:
+                playerRect.y = 480
+                t = 0
+                y_basis = 480
                 isJump = False
-                PLAYERMOVERATE_Y = 10
+            else:
+                playerRect.y = y_trajectory(y_basis, y_speed, t)
+                t += 1
+            if playerRect.x > P1_X and playerRect.x+60 < P1_X+P1_LX:
+                if P1_Y + 5 < playerRect.y < P1_Y + 15:
+                    y_speed = 0
+                elif playerRect.y + 60 < P1_Y:
+                    isOnP1 = True
+            else:
+                isOnP1 = False
+            if isOnP1 and playerRect.y + 60 > P1_Y + 5:
+                isJump = False
+                playerRect.y = P1_Y - 60
 
         # if badLeft and badRect.left > 0:
         # badRight = False
@@ -175,29 +242,25 @@ while running:
 
         badRect.x -= BADDIEMOVERATE
         if badRect.x <= 0:
-            badRect.x = 4
             badRect.x += BADDIEMOVERATE
+            BADDIEMOVERATE = -BADDIEMOVERATE
         elif badRect.x >= 550:
-            badRect.x = -4
-            badRect -= BADDIEMOVERATE
+            badRect.x += BADDIEMOVERATE
+            BADDIEMOVERATE = -BADDIEMOVERATE
 
-        # Collision Player - Obstacle
         if playerRect.colliderect(badRect):
             mixer.music.stop()
             HitSound.play()
             waitForPlayerToPressKey()
-            playerRect.update(50, 500, 50, 50)
-            badRect.update(500, 500, 50, 50)
+            playerRect.update(50, 480, 50, 50)
+            badRect.update(500, 480, 50, 50)
+            moveLeft = moveRight = False
             HitSound.stop()
             mixer.music.play(-1, 0.0)
             HEALTH -= 1
+            playerRect.y = 480
+            isOnP1 = False
             BONUS = 5000
-
-        # Collision Player - Platform
-        if playerRect.colliderect(plat1):
-            playerRect.y = plat1.top
-            PLAYERMOVERATE_Y = 0
-
 
         if HEALTH == 0:
             mixer.music.load('gameover.wav')
