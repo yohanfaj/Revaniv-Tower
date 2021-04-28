@@ -26,7 +26,7 @@ badJump = False
 
 # Plateform
 P1_X = 0
-P1_Y = 440
+P1_Y = 450
 P1_LX = 450
 P_Y = 10
 P1 = pygame.Rect(P1_X, P1_Y, P1_LX, P_Y)
@@ -70,7 +70,11 @@ class Spritesheet:
 
 
 StartScreen = pygame.image.load("Assets/main_menu.png")
+scenario = pygame.image.load("Assets/scenario.png")
+tutorial = pygame.image.load("Assets/tutoriel.png")
+GameOverScreen = pygame.image.load("Assets/game_over_screen.png")
 logo = pygame.image.load('Assets/logoicon.ico')
+
 player = pygame.image.load("Assets/core_character_right_1.png")
 player_2 = pygame.image.load("Assets/core_character_left.png")
 run_right_list = [pygame.image.load("Assets/core_character_run_right_1.png"),
@@ -79,9 +83,9 @@ run_right_list = [pygame.image.load("Assets/core_character_run_right_1.png"),
                   pygame.image.load("Assets/core_character_run_right_4.png"),
                   pygame.image.load("Assets/core_character_run_right_5.png"),
                   pygame.image.load("Assets/core_character_run_right_6.png")]
-playerRect = pygame.Rect(50, 480, 25, 49)
+playerRect = pygame.Rect(50, 480, 60, 60)
 baddie = pygame.image.load(("Assets/skin_sorcier_revaniv.png"))
-badRect = pygame.Rect(50, 180, 50, 50)
+badRect = pygame.Rect(500, 480, 50, 50)
 bg = pygame.image.load("Assets/map_cantine.jpeg")
 
 # Set up music.
@@ -89,6 +93,7 @@ StartJingle = mixer.Sound("Assets/StartJingle.wav")
 mixer.music.load('Assets/background.wav')
 HitSound = mixer.Sound('Assets/hit_sound.wav')
 GameOverSound = mixer.Sound('Assets/gameover.wav')
+TimeRun = mixer.Sound("Assets/run_time.wav")
 
 
 # Functions:
@@ -160,16 +165,16 @@ while running:
                 if event.key == K_LEFT or event.key == K_a:
                     moveRight = False
                     moveLeft = True
-                    player = pygame.image.load("Assets/core_character_run_left.png")
+                    player = pygame.image.load("core_character_run_left.png")
                 if event.key == K_RIGHT or event.key == K_d:
                     moveLeft = False
                     moveRight = True
                     player = run_right_list[0]
                 if event.key == K_SPACE and isJump == False:
                     if event.key == K_LEFT or event.key == K_a:
-                        player = pygame.image.load("Assets/core_character_jump_left.png")
+                        player = pygame.image.load("core_character_jump_left.png")
                     elif event.key == K_RIGHT or event.key == K_d:
-                        player = pygame.image.load("Assets/core_character_jump_right.png")
+                        player = pygame.image.load("core_character_jump_right.png")
                     isJump = True
                     t = 0
                     y_basis = playerRect.y
@@ -195,10 +200,10 @@ while running:
 
                 if event.key == K_LEFT or event.key == K_a:
                     moveLeft = False
-                    player = pygame.image.load("Assets/core_character_left.png")
+                    player = pygame.image.load("core_character_left.png")
                 if event.key == K_RIGHT or event.key == K_d:
                     moveRight = False
-                    player = pygame.image.load("Assets/core_character_right_1.png")
+                    player = pygame.image.load("core_character_right_1.png")
 
                 if event.key == K_m:
                     if musicPlaying:
@@ -220,29 +225,6 @@ while running:
         #        isJump = False
         #        PLAYERMOVERATE_Y = 10
 
-        # Conditions to fall from P1 if the player is not jumping
-        if not (playerRect.x + 20 > P1_X and playerRect.x + 5 < P1_X + P1_LX) and isOnP1 and not isJump:
-            isOnP1 = False
-            isJump = True
-            t = 0
-            y_basis = P1_Y - 49
-            y_speed = 0
-
-        # Conditions to fall from P2 if the player is not jumping
-        if not (playerRect.x + 20 > P2_X and playerRect.x + 5 < P2_X + P2_LX) and isOnP2 and not isJump:
-            isOnP2 = False
-            isJump = True
-            t = 0
-            y_basis = P2_Y - 49
-            y_speed = 0
-
-        # Conditions to fall from P3 if the player is not jumping
-        if not (playerRect.x + 20 > P3_X and playerRect.x + 5 < P3_X + P3_LX) and isOnP3 and not isJump:
-            isOnP3 = False
-            isJump = True
-            t = 0
-            y_basis = P3_Y - 49
-            y_speed = 0
 
         # Jump mechanics
         if isJump:
@@ -257,62 +239,63 @@ while running:
                 playerRect.y = y_trajectory(y_basis, y_speed, t)
                 t += 1
 
-            # P1 mechanics
-            # if the player is in the x zone of the platform
-            if P1_X - 25 < playerRect.x < P1_X + P1_LX:
-                # if the player is under the platform and hits it
-                if P1_Y + 5 < playerRect.y < P1_Y + 15:
-                    playerRect.y = P1_Y + P_Y
+            if playerRect.colliderect(P1):
+                if playerRect.y > P1_Y:
                     y_speed = 0
                     t = 0
-                # if the player is over the platform
-                elif playerRect.y + 49 < P1_Y:
+                    y_basis = playerRect.y+10
+                elif playerRect.y <= P1_Y:
+                    isJump = False
+                    playerRect.y = P1_Y-50
                     isOnP1 = True
-            # if the player is not in the x zone of the platform
-            else:
-                isOnP1 = False
-            # if the player is on the platform
-            if isOnP1 and playerRect.y + 49 > P1_Y + 1:
-                isJump = False
-                playerRect.y = P1_Y - 49
+                if P1_Y+P_Y>playerRect.y>P1_Y-49:
+                    isOnP1=False
 
-            # P2 mechanics
-            # if the player is in the x zone of the platform
-            if P2_X - 25 < playerRect.x < P2_X + P2_LX:
-                # if the player is under the platform and hits it
-                if P2_Y + 5 < playerRect.y < P2_Y + 15:
-                    playerRect.y = P2_Y + P_Y
+            if playerRect.colliderect(P2):
+                if playerRect.y > P2_Y:
                     y_speed = 0
                     t = 0
-                # if the player is over the platform
-                elif playerRect.y + 49 < P2_Y:
+                    y_basis = playerRect.y+10
+                elif playerRect.y <= P2_Y:
+                    isJump = False
+                    playerRect.y = P2_Y-50
                     isOnP2 = True
-            # if the player is not in the x zone of the platform
-            else:
-                isOnP2 = False
-            # if the player is on the platform
-            if isOnP2 and playerRect.y + 49 > P2_Y + 1:
-                isJump = False
-                playerRect.y = P2_Y - 49
+                if P2_Y+P_Y>playerRect.y>P2_Y-49:
+                    isOnP2=False
 
-            # P3 mechanics
-            # if the player is in the x zone of the platform
-            if P3_X - 25 < playerRect.x < P3_X + P3_LX:
-                # if the player is under the platform and hits it
-                if P3_Y + 5 < playerRect.y < P3_Y + 15:
-                    playerRect.y = P3_Y + P_Y
+            if playerRect.colliderect(P3):
+                if playerRect.y > P3_Y:
                     y_speed = 0
                     t = 0
-                # if the player is over the platform
-                elif playerRect.y + 49 < P3_Y:
+                    y_basis = playerRect.y+10
+                elif playerRect.y <= P3_Y:
+                    isJump = False
+                    playerRect.y = P3_Y-50
                     isOnP3 = True
-            # if the player is not in the x zone of the platform
-            else:
-                isOnP3 = False
-            # if the player is on the platform
-            if isOnP3 and playerRect.y + 49 > P3_Y + 1:
-                isJump = False
-                playerRect.y = P3_Y - 49
+                if P3_Y+P_Y>playerRect.y>P3_Y-49:
+                    isOnP3=False
+
+        if isOnP1 and not(P1_X-25 < playerRect.x < P1_X+P1_LX):
+            isOnP1 = False
+            isJump = True
+            y_speed = 0
+            y_basis = playerRect.y
+            t = 0
+
+        if isOnP2 and not(P2_X-25 < playerRect.x < P2_X+P2_LX):
+            isOnP2 = False
+            isJump = True
+            y_speed = 0
+            y_basis = playerRect.y
+            t = 0
+
+        if isOnP3 and not(P3_X-25 < playerRect.x < P3_X+P3_LX):
+            isOnP3 = False
+            isJump = True
+            y_speed = 0
+            y_basis = playerRect.y
+            t = 0
+
 
         # if badLeft and badRect.left > 0:
         # badRight = False
@@ -328,12 +311,12 @@ while running:
         elif badRect.x >= 550:
             badRect.x -= BADDIEMOVERATE
             BADDIEMOVERATE = -BADDIEMOVERATE
-        if badRect.x > P3_X+P3_LX and badRect.y + 60 <= P3_Y + 5 and not badJump:
+        if not(badRect.colliderect(P1) or badRect.colliderect(P2) or badRect.colliderect(P3)) and not badJump:
             bad_y_speed = 0
             badJump = True
             bad_y_basis = badRect.y
             t_bad = 0
-        if badRect.x > P2_X and P2_Y - 5 <= badRect.y + 60 <= P2_Y + 5 and badJump:
+        if (badRect.colliderect(P1) or badRect.colliderect(P2) or badRect.colliderect(P3)) and badJump:
             badJump = False
 
         if badJump:
@@ -355,7 +338,7 @@ while running:
             BONUS = 5000
 
         if HEALTH == 0:
-            mixer.music.load('Assets/gameover.wav')
+            mixer.music.load('gameover.wav')
             mixer.music.play()
             running = False
             terminate()
