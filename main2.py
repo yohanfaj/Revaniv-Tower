@@ -26,21 +26,26 @@ badJump = False
 
 # Plateform
 P1_X = 0
-P1_Y = 450
-P1_LX = 450
+P1_Y = 590
+P1_LX = 600
 P_Y = 10
 P1 = pygame.Rect(P1_X, P1_Y, P1_LX, P_Y)
 isOnP1 = False
-P2_X = 150
-P2_Y = 340
+P2_X = 0
+P2_Y = 470
 P2_LX = 450
 P2 = pygame.Rect(P2_X, P2_Y, P2_LX, P_Y)
 isOnP2 = False
-P3_X = 0
-P3_Y = 240
+P3_X = 150
+P3_Y = 350
 P3_LX = 450
 P3 = pygame.Rect(P3_X, P3_Y, P3_LX, P_Y)
 isOnP3 = False
+P4_X = 0
+P4_Y = 230
+P4_LX = 450
+P4 = pygame.Rect(P4_X, P4_Y, P4_LX, P_Y)
+isOnP4 = False
 
 
 # Set up pygame, the window, and the mouse cursor.
@@ -70,11 +75,7 @@ class Spritesheet:
 
 
 StartScreen = pygame.image.load("Assets/main_menu.png")
-scenario = pygame.image.load("Assets/scenario.png")
-tutorial = pygame.image.load("Assets/tutoriel.png")
-GameOverScreen = pygame.image.load("Assets/game_over_screen.png")
 logo = pygame.image.load('Assets/logoicon.ico')
-
 player = pygame.image.load("Assets/core_character_right_1.png")
 player_2 = pygame.image.load("Assets/core_character_left.png")
 run_right_list = [pygame.image.load("Assets/core_character_run_right_1.png"),
@@ -83,9 +84,9 @@ run_right_list = [pygame.image.load("Assets/core_character_run_right_1.png"),
                   pygame.image.load("Assets/core_character_run_right_4.png"),
                   pygame.image.load("Assets/core_character_run_right_5.png"),
                   pygame.image.load("Assets/core_character_run_right_6.png")]
-playerRect = pygame.Rect(50, 480, 60, 60)
+playerRect = pygame.Rect(50, 480, 25, 49)
 baddie = pygame.image.load(("Assets/skin_sorcier_revaniv.png"))
-badRect = pygame.Rect(500, 480, 50, 50)
+badRect = pygame.Rect(50, 180, 50, 50)
 bg = pygame.image.load("Assets/map_cantine.jpeg")
 
 # Set up music.
@@ -93,7 +94,6 @@ StartJingle = mixer.Sound("Assets/StartJingle.wav")
 mixer.music.load('Assets/background.wav')
 HitSound = mixer.Sound('Assets/hit_sound.wav')
 GameOverSound = mixer.Sound('Assets/gameover.wav')
-TimeRun = mixer.Sound("Assets/run_time.wav")
 
 
 # Functions:
@@ -121,14 +121,15 @@ def redrawScreen():
     pygame.draw.rect(windowSurface, BLUE, P1)
     pygame.draw.rect(windowSurface, BLUE, P2)
     pygame.draw.rect(windowSurface, BLUE, P3)
-    drawText('Health: %s' % (HEALTH), font, windowSurface, 10, 10)
-    drawText("Bonus Score: %s" % (BONUS), font, windowSurface, 10, 45)
+    pygame.draw.rect(windowSurface, BLUE, P4)
+    drawText('Assets/Health: %s' % (HEALTH), font, windowSurface, 10, 10)
+    drawText("Assets/Bonus Score: %s" % (BONUS), font, windowSurface, 10, 45)
     pygame.display.flip()
     windowSurface.fill(WHITE)
 
 
 def y_trajectory(y_basis, y_speed, t):
-    y = y_basis - ((-9.81 / 25) * t ** 2 / 2 + y_speed * t)
+    y = y_basis - ((-9.81 / 30) * t ** 2 / 2 + y_speed * t)
     return y
 
 
@@ -151,8 +152,6 @@ running = True
 while running:
 
     moveLeft = moveRight = False
-    badLeft = True
-    badRight = False
     mixer.music.play(-1, 0.0)
 
     while True:
@@ -228,16 +227,8 @@ while running:
 
         # Jump mechanics
         if isJump:
-            # if on the ground
-            if playerRect.y > 485:
-                playerRect.y = 480
-                t = 0
-                y_basis = 480
-                isJump = False
-            # if on a free fall
-            else:
-                playerRect.y = y_trajectory(y_basis, y_speed, t)
-                t += 1
+            playerRect.y = y_trajectory(y_basis, y_speed, t)
+            t += 1
 
             if playerRect.colliderect(P1):
                 if playerRect.y > P1_Y:
@@ -275,6 +266,18 @@ while running:
                 if P3_Y+P_Y>playerRect.y>P3_Y-49:
                     isOnP3=False
 
+            if playerRect.colliderect(P4):
+                if playerRect.y > P4_Y:
+                    y_speed = 0
+                    t = 0
+                    y_basis = playerRect.y+10
+                elif playerRect.y <= P4_Y:
+                    isJump = False
+                    playerRect.y = P4_Y-50
+                    isOnP4 = True
+                if P4_Y+P_Y>playerRect.y>P4_Y-49:
+                    isOnP4=False
+
         if isOnP1 and not(P1_X-25 < playerRect.x < P1_X+P1_LX):
             isOnP1 = False
             isJump = True
@@ -291,6 +294,13 @@ while running:
 
         if isOnP3 and not(P3_X-25 < playerRect.x < P3_X+P3_LX):
             isOnP3 = False
+            isJump = True
+            y_speed = 0
+            y_basis = playerRect.y
+            t = 0
+
+        if isOnP4 and not(P4_X-25 < playerRect.x < P4_X+P4_LX):
+            isOnP4 = False
             isJump = True
             y_speed = 0
             y_basis = playerRect.y
@@ -338,7 +348,7 @@ while running:
             BONUS = 5000
 
         if HEALTH == 0:
-            mixer.music.load('gameover.wav')
+            mixer.music.load('Assets/gameover.wav')
             mixer.music.play()
             running = False
             terminate()
