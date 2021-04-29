@@ -165,16 +165,16 @@ while running:
                 if event.key == K_LEFT or event.key == K_a:
                     moveRight = False
                     moveLeft = True
-                    player = pygame.image.load("core_character_run_left.png")
+                    player = pygame.image.load("Assets/core_character_run_left.png")
                 if event.key == K_RIGHT or event.key == K_d:
                     moveLeft = False
                     moveRight = True
                     player = run_right_list[0]
                 if event.key == K_SPACE and isJump == False:
                     if event.key == K_LEFT or event.key == K_a:
-                        player = pygame.image.load("core_character_jump_left.png")
+                        player = pygame.image.load("Assets/core_character_jump_left.png")
                     elif event.key == K_RIGHT or event.key == K_d:
-                        player = pygame.image.load("core_character_jump_right.png")
+                        player = pygame.image.load("Assets/core_character_jump_right.png")
                     isJump = True
                     t = 0
                     y_basis = playerRect.y
@@ -200,10 +200,10 @@ while running:
 
                 if event.key == K_LEFT or event.key == K_a:
                     moveLeft = False
-                    player = pygame.image.load("core_character_left.png")
+                    player = pygame.image.load("Assets/core_character_left.png")
                 if event.key == K_RIGHT or event.key == K_d:
                     moveRight = False
-                    player = pygame.image.load("core_character_right_1.png")
+                    player = pygame.image.load("Assets/core_character_right_1.png")
 
                 if event.key == K_m:
                     if musicPlaying:
