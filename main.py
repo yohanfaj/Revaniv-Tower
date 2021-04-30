@@ -1,6 +1,6 @@
 import pygame, sys, time
 from pygame.locals import *
-from pygame import mixer
+pygame.mixer.pre_init(44100, -16, 2, 512)
 from time import sleep
 
 WINDOWWIDTH = 600
@@ -19,7 +19,7 @@ PLAYERMOVERATE_Y = 10
 BADDIEMOVERATE = 1
 
 HEALTH = 3
-BONUS = 1400
+BONUS = 1100
 bonus_cpt = 0
 isJump = False
 
@@ -35,7 +35,7 @@ isOnP1 = False
 pygame.init()
 mainClock = pygame.time.Clock()
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-pygame.display.set_caption("Revaniv's Tower - Alpha")
+pygame.display.set_caption("Revaniv's Tower")
 pygame.mouse.set_visible(True)
 
 # Set up the fonts.
@@ -75,13 +75,12 @@ baddie = pygame.image.load(("Assets/skin_sorcier_revaniv.png"))
 badRect = pygame.Rect(500, 480, 50, 50)
 bg = pygame.image.load("Assets/map_cantine.jpeg")
 
-
 # Set up music.
-StartJingle = mixer.Sound("Assets/StartJingle.wav")
-mixer.music.load('Assets/background.wav')
-HitSound = mixer.Sound('Assets/hit_sound.wav')
-GameOverSound = mixer.Sound('Assets/gameover.wav')
-TimeRun = mixer.Sound("Assets/run_time.wav")
+StartJingle = pygame.mixer.Sound("Assets/StartJingle.wav")
+pygame.mixer.music.load('Assets/background.wav')
+HitSound = pygame.mixer.Sound('Assets/hit_sound.wav')
+GameOverSound = pygame.mixer.Sound('Assets/gameover.wav')
+TimeRun = pygame.mixer.Sound("Assets/run_time.mp3")
 
 
 # Functions:
@@ -124,12 +123,12 @@ def drawText(text, font, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
+
 def drawTextRed(text, font, surface, x, y):
     textobj = font.render(text, 1, RED)
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
-
 
 
 def displayScreen(x):
@@ -139,18 +138,18 @@ def displayScreen(x):
 
 
 # Set up the Start screen of the game:
-#windowSurface.blit(StartScreen, (0, 0))
-#StartJingle.play()
-#pygame.display.update()
-#time.sleep(5)
-#waitForPlayerToPressKey()
+# windowSurface.blit(StartScreen, (0, 0))
+# StartJingle.play()
+# pygame.display.update()
+# time.sleep(5)
+# waitForPlayerToPressKey()
 
 
 displayScreen(scenario)
 StartJingle.play()
 displayScreen(StartScreen)
 displayScreen(tutorial)
-
+time.sleep(4.2)
 
 musicPlaying = True
 running = True
@@ -160,7 +159,7 @@ while running:
     moveLeft = moveRight = False
     badLeft = True
     badRight = False
-    mixer.music.play(-1, 0.0)
+    pygame.mixer.music.play(-1, 0.0, 5000)
 
     while True:
         for event in pygame.event.get():
@@ -214,9 +213,9 @@ while running:
 
                 if event.key == K_m:
                     if musicPlaying:
-                        mixer.music.stop()
+                        pygame.mixer.music.stop()
                     else:
-                        mixer.music.play(-1, 0.0)
+                        pygame.mixer.music.play(-1, 0.0, 5000)
                     musicPlaying = not musicPlaying
 
         # Move the player around.
@@ -274,10 +273,9 @@ while running:
             badRect.x += BADDIEMOVERATE
             BADDIEMOVERATE = -BADDIEMOVERATE
 
-
         if HEALTH == 0:
-            mixer.music.load('Assets/gameover.wav')
-            mixer.music.play()
+            pygame.mixer.music.load('Assets/gameover.wav')
+            pygame.mixer.music.play()
             displayScreen(GameOverScreen)
             running = False
             terminate()
@@ -286,22 +284,25 @@ while running:
         if bonus_cpt > 150:
             BONUS -= 100
             bonus_cpt = 0
-        #if BONUS <= 1000:
-          #  drawTextRed("Time Score: %s" % (BONUS), font, windowSurface, 10, 45)
-           # TimeRun.play()
+        if BONUS == 1000:
+            pygame.mixer.music.stop()
+            TimeRun.set_volume(0.3)
+            TimeRun.play()
+            pygame.mixer.music.play(-1, 0.0, 5000)
+        # while BONUS <= 1000:
+        # drawTextRed("Time Score: %s" % (BONUS), font, windowSurface, 10, 45)
         if BONUS < 0:
             BONUS = 0
 
-
             if playerRect.colliderect(badRect) or BONUS == 0:
-                mixer.music.stop()
+                pygame.mixer.music.stop()
                 HitSound.play()
                 waitForPlayerToPressKey()
                 playerRect.update(50, 480, 50, 50)
                 badRect.update(500, 480, 50, 50)
                 moveLeft = moveRight = False
                 HitSound.stop()
-                mixer.music.play(-1, 0.0)
+                pygame.mixer.music.play(-1, 0.0, 5000)
                 HEALTH -= 1
                 playerRect.y = 480
                 isOnP1 = False
