@@ -442,7 +442,7 @@ while running:
             HitSound.play()
             waitForPlayerToPressKey()
             playerRect.update(50, 480, 50, 50)
-            badRect.update(500, 480, 50, 50)
+            badRect.update(50, 180, 50, 50)
             moveLeft = moveRight = False
             HitSound.stop()
             pygame.mixer.music.play(-1, 0.0, 3000)
