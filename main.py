@@ -449,6 +449,7 @@ while running:
             HitSound.play()
             waitForPlayerToPressKey()
             playerRect.update(0, 541, 25, 49)
+            isJump = False
             badRect.update(50, 180, 50, 50)
             tomato1rect.update(50, 190, 15, 15)
             tomato2rect.update(50, 190, 15, 15)
