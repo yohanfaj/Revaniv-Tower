@@ -165,7 +165,7 @@ def displayScreen(x):
 
 def displayWinScreen(x):
     windowSurface.blit(x, (0, 0))
-    drawText("%s" %(finalscore), font, windowSurface, BLUE, 400, 500)
+    drawText("%s" %(finalscore), font, windowSurface, BLUE, 400, 487)
     pygame.display.update()
     waitForPlayerToPressKey()
 
@@ -423,6 +423,7 @@ while running:
             tomato3moverate = -tomato3moverate
 
         if HEALTH == 0:
+            pygame.mixer.music.stop()
             GameOverSound.play()
             displayScreen(GameOverScreen)
             waitForPlayerToPressKey()
