@@ -25,6 +25,7 @@ BONUS = 5000
 bonus_cpt = 0
 isJump = False
 tomato1jump = tomato2jump = tomato3jump = False
+finalscore = 0
 
 # Plateform
 P1_X = 0
@@ -79,6 +80,7 @@ scenario = pygame.image.load("Assets/scenario.png")
 tutorial = pygame.image.load("Assets/tutoriel.png")
 GameOverScreen = pygame.image.load("Assets/game_over_screen.png")
 logo = pygame.image.load('Assets/logoicon.ico')
+Win_screen = pygame.image.load("Assets/Win_screen.png")
 
 player = pygame.image.load("Assets/core_character_right_1.png")
 player_2 = pygame.image.load("Assets/core_character_left.png")
@@ -419,7 +421,8 @@ while running:
         if HEALTH == 0:
             pygame.mixer.music.load('Assets/gameover.wav')
             pygame.mixer.music.play()
-            running = False
+            displayScreen(GameOverScreen)
+            waitForPlayerToPressKey()
             terminate()
 
         bonus_cpt += 1
@@ -438,18 +441,33 @@ while running:
 
 
         if playerRect.colliderect(tomato1rect) or playerRect.colliderect(tomato2rect) or playerRect.colliderect(tomato3rect) or BONUS == 0:
+            tomato1jump = tomato2jump = tomato3jump = False
             pygame.mixer.music.stop()
             HitSound.play()
             waitForPlayerToPressKey()
-            playerRect.update(50, 480, 50, 50)
+            playerRect.update(0, 541, 25, 49)
             badRect.update(50, 180, 50, 50)
+            tomato1rect.update(50,190,15,15)
+            tomato2rect.update(50,190,15,15)
+            tomato3rect.update(50,190,15,15)
+            tomato1moverate = tomato2moverate = tomato3moverate = 0
+            tomato_timer = 0
             moveLeft = moveRight = False
             HitSound.stop()
             pygame.mixer.music.play(-1, 0.0, 3000)
             HEALTH -= 1
-            playerRect.y = 480
-            isOnP1 = False
             BONUS = 5000
+
+
+        if playerRect.colliderect(badRect):
+            moveLeft = moveRight = False
+            tomato1moverate = tomato2moverate = tomato3moverate = 0
+            tomato1jump = tomato2jump = tomato3jump = False
+            finalscore = BONUS
+            pygame.mixer.music.stop()
+            displayScreen(Win_screen)
+            waitForPlayerToPressKey()
+            terminate()
 
 
         redrawScreen()
