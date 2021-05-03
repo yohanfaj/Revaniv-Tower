@@ -3,7 +3,6 @@ from pygame.locals import *
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 
-
 WINDOWWIDTH = 600
 WINDOWHEIGHT = 600
 TEXTCOLOR = (0, 0, 0)
@@ -21,7 +20,7 @@ tomato1moverate = tomato2moverate = tomato3moverate = 0
 tomato_timer = 0
 
 HEALTH = 3
-BONUS = 5000
+BONUS = 1100
 bonus_cpt = 0
 isJump = False
 tomato1jump = tomato2jump = tomato3jump = False
@@ -107,6 +106,7 @@ pygame.mixer.music.load('Assets/background.wav')
 HitSound = pygame.mixer.Sound('Assets/hit_sound.wav')
 GameOverSound = pygame.mixer.Sound('Assets/gameover.wav')
 TimeRun = pygame.mixer.Sound("Assets/run_time.mp3")
+WinSound = pygame.mixer.Sound("Assets/win_sound.mp3")
 
 
 # Functions:
@@ -131,15 +131,15 @@ def redrawScreen():
     windowSurface.blit(bg, (0, 0))
     windowSurface.blit(player, playerRect)
     windowSurface.blit(baddie, badRect)
-    windowSurface.blit(tomato1,tomato1rect)
+    windowSurface.blit(tomato1, tomato1rect)
     windowSurface.blit(tomato2, tomato2rect)
     windowSurface.blit(tomato3, tomato3rect)
     pygame.draw.rect(windowSurface, BLUE, P1)
     pygame.draw.rect(windowSurface, BLUE, P2)
     pygame.draw.rect(windowSurface, BLUE, P3)
     pygame.draw.rect(windowSurface, BLUE, P4)
-    drawText('Health: %s' % (HEALTH), font, windowSurface, 10, 10)
-    drawText("Bonus Score: %s" % (BONUS), font, windowSurface, 10, 45)
+    drawText('Health: %s' % (HEALTH), font, windowSurface, WHITE, 10, 10)
+    drawText("Time Score: %s" % (BONUS), font, windowSurface, WHITE, 10, 45)
     pygame.display.flip()
     windowSurface.fill(WHITE)
 
@@ -149,18 +149,12 @@ def y_trajectory(y_basis, y_speed, t):
     return y
 
 
-def drawText(text, font, surface, x, y):
-    textobj = font.render(text, 1, WHITE)
+def drawText(text, font, surface, color, x, y):
+    textobj = font.render(text, 1, color)
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
-
-def drawTextRed(text, font, surface, x, y):
-    textobj = font.render(text, 1, RED)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
 
 
 def displayScreen(x):
@@ -168,6 +162,12 @@ def displayScreen(x):
     pygame.display.update()
     waitForPlayerToPressKey()
 
+
+def displayWinScreen(x):
+    windowSurface.blit(x, (0, 0))
+    drawText("%s" %(finalscore), font, windowSurface, BLUE, 400, 500)
+    pygame.display.update()
+    waitForPlayerToPressKey()
 
 
 # Set up the Start screen of the game:
@@ -179,7 +179,6 @@ time.sleep(3.5)
 
 musicPlaying = True
 running = True
-
 
 while running:
 
@@ -345,30 +344,34 @@ while running:
         # badRect.right += BADDIEMOVERATE
 
         tomato1rect.x += tomato1moverate
-        if (not(585 >= tomato1rect.x >= 0) and tomato1rect.y < 550) or (tomato1rect.y > 550 and tomato1rect.x >= 585):
+        if (not (585 >= tomato1rect.x >= 0) and tomato1rect.y < 550) or (tomato1rect.y > 550 and tomato1rect.x >= 585):
             tomato1rect.x -= tomato1moverate
             tomato1moverate = -tomato1moverate
-        if not (tomato1rect.colliderect(P1) or tomato1rect.colliderect(P2) or tomato1rect.colliderect(P3) or tomato1rect.colliderect(P4)) and not tomato1jump:
+        if not (tomato1rect.colliderect(P1) or tomato1rect.colliderect(P2) or tomato1rect.colliderect(
+                P3) or tomato1rect.colliderect(P4)) and not tomato1jump:
             tomato1jump = True
             tomato1_y_basis = tomato1rect.y
             t_tomato1 = 0
-        if (tomato1rect.colliderect(P1) or tomato1rect.colliderect(P2) or tomato1rect.colliderect(P3) or tomato1rect.colliderect(P4)) and tomato1jump:
+        if (tomato1rect.colliderect(P1) or tomato1rect.colliderect(P2) or tomato1rect.colliderect(
+                P3) or tomato1rect.colliderect(P4)) and tomato1jump:
             tomato1jump = False
-            tomato1rect.y-=10
+            tomato1rect.y -= 10
 
         if tomato1jump:
             tomato1rect.y = y_trajectory(tomato1_y_basis, 0, t_tomato1)
             t_tomato1 += 1
 
         tomato2rect.x += tomato2moverate
-        if (not(585 >= tomato2rect.x >= 0) and tomato2rect.y < 550) or (tomato2rect.y > 550 and tomato2rect.x >= 585):
+        if (not (585 >= tomato2rect.x >= 0) and tomato2rect.y < 550) or (tomato2rect.y > 550 and tomato2rect.x >= 585):
             tomato2rect.x -= tomato2moverate
             tomato2moverate = -tomato2moverate
-        if not (tomato2rect.colliderect(P1) or tomato2rect.colliderect(P2) or tomato2rect.colliderect(P3) or tomato2rect.colliderect(P4)) and not tomato2jump:
+        if not (tomato2rect.colliderect(P1) or tomato2rect.colliderect(P2) or tomato2rect.colliderect(
+                P3) or tomato2rect.colliderect(P4)) and not tomato2jump:
             tomato2jump = True
             tomato2_y_basis = tomato2rect.y
             t_tomato2 = 0
-        if (tomato2rect.colliderect(P1) or tomato2rect.colliderect(P2) or tomato2rect.colliderect(P3) or tomato2rect.colliderect(P4)) and tomato2jump:
+        if (tomato2rect.colliderect(P1) or tomato2rect.colliderect(P2) or tomato2rect.colliderect(
+                P3) or tomato2rect.colliderect(P4)) and tomato2jump:
             tomato2jump = False
             tomato2rect.y -= 10
 
@@ -377,14 +380,16 @@ while running:
             t_tomato2 += 1
 
         tomato3rect.x += tomato3moverate
-        if (not(585 >= tomato3rect.x >= 0) and tomato3rect.y < 550) or (tomato3rect.y > 550 and tomato3rect.x >= 585):
+        if (not (585 >= tomato3rect.x >= 0) and tomato3rect.y < 550) or (tomato3rect.y > 550 and tomato3rect.x >= 585):
             tomato3rect.x -= tomato3moverate
             tomato3moverate = -tomato3moverate
-        if not (tomato3rect.colliderect(P1) or tomato3rect.colliderect(P2) or tomato3rect.colliderect(P3) or tomato3rect.colliderect(P4)) and not tomato3jump:
+        if not (tomato3rect.colliderect(P1) or tomato3rect.colliderect(P2) or tomato3rect.colliderect(
+                P3) or tomato3rect.colliderect(P4)) and not tomato3jump:
             tomato3jump = True
             tomato3_y_basis = tomato3rect.y
             t_tomato3 = 0
-        if (tomato3rect.colliderect(P1) or tomato3rect.colliderect(P2) or tomato3rect.colliderect(P3) or tomato3rect.colliderect(P4)) and tomato3jump:
+        if (tomato3rect.colliderect(P1) or tomato3rect.colliderect(P2) or tomato3rect.colliderect(
+                P3) or tomato3rect.colliderect(P4)) and tomato3jump:
             tomato3jump = False
             tomato3rect.y -= 10
 
@@ -401,7 +406,7 @@ while running:
         if tomato_timer == 460:
             tomato3moverate = 4
 
-        if(tomato1rect.y > 500 and tomato1rect.x < -15):
+        if (tomato1rect.y > 500 and tomato1rect.x < -15):
             tomato1rect.x = 50
             tomato1rect.y = 190
             tomato1jump = False
@@ -417,10 +422,8 @@ while running:
             tomato3jump = False
             tomato3moverate = -tomato3moverate
 
-
         if HEALTH == 0:
-            pygame.mixer.music.load('Assets/gameover.wav')
-            pygame.mixer.music.play()
+            GameOverSound.play()
             displayScreen(GameOverScreen)
             waitForPlayerToPressKey()
             terminate()
@@ -431,25 +434,25 @@ while running:
             bonus_cpt = 0
         if BONUS == 1000:
             pygame.mixer.music.stop()
-            TimeRun.set_volume(0.3)
+            TimeRun.set_volume(0.5)
             TimeRun.play()
             pygame.mixer.music.play(-1, 0.0, 3000)
-        # while BONUS <= 1000:
-        # drawTextRed("Time Score: %s" % (BONUS), font, windowSurface, 10, 45)
+        #while BONUS <= 1000:
+            #drawText("Time Score: %s" % (BONUS), font, windowSurface, RED, 10, 45)
         if BONUS < 0:
             BONUS = 0
 
-
-        if playerRect.colliderect(tomato1rect) or playerRect.colliderect(tomato2rect) or playerRect.colliderect(tomato3rect) or BONUS == 0:
+        if playerRect.colliderect(tomato1rect) or playerRect.colliderect(tomato2rect) or playerRect.colliderect(
+                tomato3rect) or BONUS == 0:
             tomato1jump = tomato2jump = tomato3jump = False
             pygame.mixer.music.stop()
             HitSound.play()
             waitForPlayerToPressKey()
             playerRect.update(0, 541, 25, 49)
             badRect.update(50, 180, 50, 50)
-            tomato1rect.update(50,190,15,15)
-            tomato2rect.update(50,190,15,15)
-            tomato3rect.update(50,190,15,15)
+            tomato1rect.update(50, 190, 15, 15)
+            tomato2rect.update(50, 190, 15, 15)
+            tomato3rect.update(50, 190, 15, 15)
             tomato1moverate = tomato2moverate = tomato3moverate = 0
             tomato_timer = 0
             moveLeft = moveRight = False
@@ -458,17 +461,16 @@ while running:
             HEALTH -= 1
             BONUS = 5000
 
-
         if playerRect.colliderect(badRect):
             moveLeft = moveRight = False
             tomato1moverate = tomato2moverate = tomato3moverate = 0
             tomato1jump = tomato2jump = tomato3jump = False
-            finalscore = BONUS
+            finalscore = BONUS + 1000*HEALTH
             pygame.mixer.music.stop()
-            displayScreen(Win_screen)
+            WinSound.play()
+            displayWinScreen(Win_screen)
             waitForPlayerToPressKey()
             terminate()
-
 
         redrawScreen()
         mainClock.tick(FPS)
