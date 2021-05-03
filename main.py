@@ -20,7 +20,7 @@ tomato1moverate = tomato2moverate = tomato3moverate = 0
 tomato_timer = 0
 
 HEALTH = 3
-BONUS = 1100
+BONUS = 5000
 bonus_cpt = 0
 isJump = False
 tomato1jump = tomato2jump = tomato3jump = False
