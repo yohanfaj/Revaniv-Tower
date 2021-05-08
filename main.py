@@ -104,7 +104,7 @@ bg = pygame.image.load("Assets/map_cantine.jpeg")
 StartJingle = pygame.mixer.Sound("Assets/StartJingle.wav")
 pygame.mixer.music.load('Assets/background.wav')
 HitSound = pygame.mixer.Sound('Assets/hit_sound.wav')
-GameOverSound = pygame.mixer.Sound('Assets/gameover.wav')
+GameOverSound = pygame.mixer.Sound('Assets/gameover.mp3')
 TimeRun = pygame.mixer.Sound("Assets/run_time.mp3")
 WinSound = pygame.mixer.Sound("Assets/win_sound.mp3")
 
