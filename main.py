@@ -165,7 +165,7 @@ def displayScreen(x):
 
 def displayWinScreen(x):
     windowSurface.blit(x, (0, 0))
-    drawText("%s" %(finalscore), font, windowSurface, BLUE, 400, 487)
+    drawText("%s" %(finalscore), font, windowSurface, WHITE, 335, 110)
     pygame.display.update()
     waitForPlayerToPressKey()
 
