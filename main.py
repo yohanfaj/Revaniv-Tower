@@ -171,6 +171,7 @@ def displayWinScreen(x):
 
 
 # Set up the Start screen of the game:
+# waitForPlayerToPressKey() to rec
 displayScreen(scenario)
 StartJingle.play()
 displayScreen(StartScreen)

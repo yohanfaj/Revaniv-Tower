@@ -18,8 +18,8 @@ PLAYERMOVERATE_X = 4
 PLAYERMOVERATE_Y = 10
 BADDIEMOVERATE = 1
 
-HEALTH = 3
-BONUS = 1100
+HEALTH = 1
+BONUS = 1500
 bonus_cpt = 0
 isJump = False
 
@@ -59,7 +59,7 @@ class Spritesheet:
 StartScreen = pygame.image.load("Assets/main_menu.png")
 scenario = pygame.image.load("Assets/scenario.png")
 tutorial = pygame.image.load("Assets/tutoriel.png")
-GameOverScreen = pygame.image.load("Assets/game_over_screen.png")
+GameOverScreen = pygame.image.load("Assets/go_test.png")
 logo = pygame.image.load('Assets/logoicon.ico')
 
 player = pygame.image.load("Assets/core_character_right_1.png")
@@ -73,13 +73,20 @@ run_right_list = [pygame.image.load("Assets/core_character_run_right_1.png"),
 playerRect = pygame.Rect(50, 480, 60, 60)
 baddie = pygame.image.load(("Assets/skin_sorcier_revaniv.png"))
 badRect = pygame.Rect(500, 480, 50, 50)
+
 bg = pygame.image.load("Assets/map_cantine.jpeg")
+ta_button = pygame.image.load("Assets/tryagain_button.png")
+ta_button_rect = ta_button.get_rect()
+ta_button_rect.x, ta_button_rect.y = 300, 460
+quit_button = pygame.image.load("Assets/quit_button.png")
+quit_button_rect = quit_button.get_rect()
+quit_button_rect.x, quit_button_rect.y = 30, 460
 
 # Set up music.
 StartJingle = pygame.mixer.Sound("Assets/StartJingle.wav")
 pygame.mixer.music.load('Assets/background.wav')
 HitSound = pygame.mixer.Sound('Assets/hit_sound.wav')
-GameOverSound = pygame.mixer.Sound('Assets/gameover.wav')
+GameOverSound = pygame.mixer.Sound('Assets/gameover.mp3')
 TimeRun = pygame.mixer.Sound("Assets/run_time.mp3")
 
 
@@ -199,7 +206,7 @@ while running:
             # isJump = False
             # playerRect.y = 480
 
-            if event.type == KEYUP:
+            elif event.type == KEYUP:
                 if event.key == K_ESCAPE:
                     running = False
                     terminate()
@@ -217,6 +224,14 @@ while running:
                     else:
                         pygame.mixer.music.play(-1, 0.0, 5000)
                     musicPlaying = not musicPlaying
+
+
+
+            # if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                #X_MOUSE, Y_MOUSE = pygame.mouse.get_pos()
+                #if 320 < X_MOUSE < 540 and 450 < Y_MOUSE < 530 and HEALTH==0:
+                    #running = False
+                    #terminate()
 
         # Move the player around.
         if moveLeft and playerRect.left > 0:
@@ -306,8 +321,15 @@ while running:
             pygame.mixer.music.load('Assets/gameover.wav')
             pygame.mixer.music.play()
             displayScreen(GameOverScreen)
-            running = False
-            terminate()
+            windowSurface.blit(ta_button, ta_button_rect)
+            windowSurface.blit(quit_button, quit_button_rect)
+
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if quit_button_rect.collidepoint(event.pos):
+                        running = False
+                        terminate()
+
 
 
         redrawScreen()
