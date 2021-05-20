@@ -1,4 +1,4 @@
-import pygame, sys, time
+import pygame, sys, random
 from pygame.locals import *
 pygame.mixer.pre_init(44100, -16, 2, 512)
 import constants as cst
@@ -69,3 +69,5 @@ def displayWinScreen(x):
     drawText("%s" % cst.finalscore, ast.font, windowSurface, cst.WHITE, 335, 107.5)
     pygame.display.update()
     waitForPlayerToPressKey()
+
+

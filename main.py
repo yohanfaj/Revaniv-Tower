@@ -1,4 +1,4 @@
-import pygame, sys, time
+import pygame, sys, time, random
 from pygame.locals import *
 pygame.mixer.pre_init(44100, -16, 2, 512)
 import assets as ast
@@ -16,13 +16,7 @@ pygame.mouse.set_visible(True)
 
 # ASSETS
 
-
-
-
-
-# Functions:
-
-
+# FUNCTIONS
 
 
 # Set up the Start screen of the game:
@@ -297,8 +291,14 @@ while running:
         if cst.BONUS < 0:
             cst.BONUS = 0
 
-        if ast.playerRect.colliderect(ast.tomato1rect) or ast.playerRect.colliderect(ast.tomato2rect) or ast.playerRect.colliderect(
-                ast.tomato3rect) or cst.BONUS == 0:
+        if cst.BONUS <= 3700:
+            windowSurface.blit(ast.potion, ast.potionRect)
+            if ast.playerRect.colliderect(ast.potionRect):
+                cst.HEALTH += 1
+              
+
+
+        if ast.playerRect.colliderect(ast.tomato1rect) or ast.playerRect.colliderect(ast.tomato2rect) or ast.playerRect.colliderect(ast.tomato3rect) or cst.BONUS == 0:
             cst.tomato1jump = cst.tomato2jump = cst.tomato3jump = False
             pygame.mixer.music.stop()
             ast.HitSound.play()
