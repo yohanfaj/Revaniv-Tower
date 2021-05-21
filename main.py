@@ -18,7 +18,8 @@ FPS = 60
 PLAYERMOVERATE_X = 4
 PLAYERMOVERATE_Y = 10
 tomato1moverate = tomato2moverate = tomato3moverate = 0
-timer = 0
+timer = t_beer = beer_cooldown = 0
+beer_x = 0
 
 HEALTH = 3
 BONUS = 5000
@@ -142,6 +143,7 @@ def redrawScreen():
     windowSurface.blit(tomato2, tomato2rect)
     windowSurface.blit(tomato3, tomato3rect)
     windowSurface.blit(potion, potionrect)
+    windowSurface.blit(beer, beerrect)
     pygame.draw.rect(windowSurface, BLUE, P1)
     pygame.draw.rect(windowSurface, BLUE, P2)
     pygame.draw.rect(windowSurface, BLUE, P3)
@@ -153,7 +155,7 @@ def redrawScreen():
 
 
 def y_trajectory(y_basis, y_speed, t):
-    y = y_basis - ((-9.81 / 30) * t ** 2 / 2 + y_speed * t)
+    y = y_basis - ((-9.81 / 30) * (t ** 2) / 2 + y_speed * t)
     return y
 
 
@@ -177,6 +179,9 @@ def displayWinScreen(x):
     pygame.display.update()
     waitForPlayerToPressKey()
 
+def beer_x_speed(player_x):
+    x_speed = (player_x-60)/64
+    return x_speed
 
 # Set up the Start screen of the game:
 # waitForPlayerToPressKey() to rec
@@ -345,6 +350,30 @@ while running:
             y_basis = playerRect.y
             t = 0
 
+        if (not beer_launched) and playerRect.y < P4_Y and beer_cooldown==0:
+            beerrect.x = 60
+            beerrect.y = 180
+            beer_x = beer_x_speed(playerRect.x)
+            beer_launched = True
+            t_beer = 0
+
+        if beer_launched and not(0 < beerrect.x < 575):
+            beer_x = -beer_x
+
+        if beer_launched and (beerrect.colliderect(P3) or beerrect.colliderect(P4)):
+            beer_launched = False
+            beer_x = 0
+            beerrect.x = beerrect.y = 600
+            beer_cooldown = 60
+
+        if beer_launched:
+            beerrect.y = y_trajectory(180, 10, t_beer)
+            beerrect.x += beer_x
+            t_beer += 1
+        if not(beer_launched) and beer_cooldown>0:
+            beer_cooldown-=1
+
+
         # if badLeft and badRect.left > 0:
         # badRight = False
         # badRect.left -= BADDIEMOVERATE
@@ -465,7 +494,7 @@ while running:
             BONUS = 0
 
         if playerRect.colliderect(tomato1rect) or playerRect.colliderect(tomato2rect) or playerRect.colliderect(
-                tomato3rect) or BONUS == 0:
+                tomato3rect) or playerRect.colliderect(beerrect) or BONUS == 0:
             tomato1jump = tomato2jump = tomato3jump = False
             pygame.mixer.music.stop()
             HitSound.play()
@@ -476,6 +505,8 @@ while running:
             tomato1rect.update(50, 190, 15, 15)
             tomato2rect.update(50, 190, 15, 15)
             tomato3rect.update(50, 190, 15, 15)
+            beer_launched = False
+            beerrect.update(600,600,25, 23)
             tomato1moverate = tomato2moverate = tomato3moverate = 0
             timer = 0
             moveLeft = moveRight = False
