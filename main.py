@@ -110,6 +110,7 @@ HitSound = pygame.mixer.Sound('Assets/hit_sound.wav')
 GameOverSound = pygame.mixer.Sound('Assets/gameover.mp3')
 TimeRun = pygame.mixer.Sound("Assets/run_time.mp3")
 WinSound = pygame.mixer.Sound("Assets/win_sound.mp3")
+potionSound = pygame.mixer.Sound("Assets/potion.mp3")
 
 
 # Functions:
@@ -418,6 +419,7 @@ while running:
             potionrect.y = 600
 
         if playerRect.colliderect(potionrect):
+            potionSound.play()
             potionrect.x = 600
             potionrect.y = 600
             HEALTH += 1
