@@ -1,4 +1,4 @@
-import pygame, sys, time, random
+import pygame, sys, time
 from pygame.locals import *
 pygame.mixer.pre_init(44100, -16, 2, 512)
 import constants as cst
@@ -39,7 +39,6 @@ run_right_list = [pygame.image.load("Assets/core_character_run_right_1.png"),
                   pygame.image.load("Assets/core_character_run_right_5.png"),
                   pygame.image.load("Assets/core_character_run_right_6.png")]
 playerRect = pygame.Rect(0, 541, 25, 49)
-
 baddie = pygame.image.load(("Assets/skin_sorcier_revaniv.png"))
 badRect = pygame.Rect(50, 180, 50, 50)
 tomato1 = pygame.image.load("Assets/tomato.png")
@@ -48,13 +47,7 @@ tomato2 = pygame.image.load("Assets/tomato.png")
 tomato2rect = pygame.Rect(50, 190, 15, 15)
 tomato3 = pygame.image.load("Assets/tomato.png")
 tomato3rect = pygame.Rect(50, 190, 15, 15)
-
 bg = pygame.image.load("Assets/map_cantine.jpeg")
-potion = pygame.image.load("Assets/potion.png")
-potionRect = potion.get_rect()
-potion_y = {0: cst.P_Y, 1: cst.P1_Y, 2: cst.P2_Y, 3: cst.P3_Y}
-potionRect.x = random.randint(0, 600)
-potionRect.y = potion_y[random.randint(0, 3)]+30
 
 # Set up music.
 StartJingle = pygame.mixer.Sound("Assets/StartJingle.wav")
