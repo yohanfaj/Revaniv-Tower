@@ -520,8 +520,6 @@ while running:
             pygame.mixer.music.play(-1, 0.0, 3000)
         #while BONUS <= 1000:
             #drawText("Time Score: %s" % (BONUS), font, windowSurface, RED, 10, 45)
-        if BONUS < 0:
-            BONUS = 0
 
         if playerRect.colliderect(tomato1rect) or playerRect.colliderect(tomato2rect) or playerRect.colliderect(
                 tomato3rect) or playerRect.colliderect(beerrect):
@@ -546,7 +544,7 @@ while running:
             BONUS = 5000
             death[0]+=1
 
-        if BONUS < 0:
+        if BONUS == -100:
             tomato1jump = tomato2jump = tomato3jump = False
             pygame.mixer.music.stop()
             HitSound.play()
