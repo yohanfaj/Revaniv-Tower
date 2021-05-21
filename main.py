@@ -1,5 +1,6 @@
-import pygame, sys, time
+import pygame, sys, time, random
 from pygame.locals import *
+from random import randint
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
 
@@ -99,6 +100,8 @@ tomato2rect = pygame.Rect(50, 190, 15, 15)
 tomato3 = pygame.image.load("Assets/tomato.png")
 tomato3rect = pygame.Rect(50, 190, 15, 15)
 bg = pygame.image.load("Assets/map_cantine.jpeg")
+potion = pygame.image.load("Assets/potion.png")
+potionrect = pygame.Rect(600,600,17,28)
 
 # Set up music.
 StartJingle = pygame.mixer.Sound("Assets/StartJingle.wav")
@@ -134,6 +137,7 @@ def redrawScreen():
     windowSurface.blit(tomato1, tomato1rect)
     windowSurface.blit(tomato2, tomato2rect)
     windowSurface.blit(tomato3, tomato3rect)
+    windowSurface.blit(potion, potionrect)
     pygame.draw.rect(windowSurface, BLUE, P1)
     pygame.draw.rect(windowSurface, BLUE, P2)
     pygame.draw.rect(windowSurface, BLUE, P3)
@@ -398,14 +402,25 @@ while running:
             tomato3rect.y = y_trajectory(tomato3_y_basis, 0, t_tomato3)
             t_tomato3 += 1
 
-        tomato_timer += 1
+        timer += 1
 
-        if tomato_timer == 60:
+        if timer == 60:
             tomato1moverate = 4
-        if tomato_timer == 260:
+        if timer == 260:
             tomato2moverate = 4
-        if tomato_timer == 460:
+        if timer == 460:
             tomato3moverate = 4
+        if timer == 700:
+            potionrect.x = randint(50,420)
+            potionrect.y = 440
+        if timer < 700:
+            potionrect.x = 600
+            potionrect.y = 600
+
+        if playerRect.colliderect(potionrect):
+            potionrect.x = 600
+            potionrect.y = 600
+            HEALTH += 1
 
         if (tomato1rect.y > 500 and tomato1rect.x < -15):
             tomato1rect.x = 50
@@ -457,7 +472,7 @@ while running:
             tomato2rect.update(50, 190, 15, 15)
             tomato3rect.update(50, 190, 15, 15)
             tomato1moverate = tomato2moverate = tomato3moverate = 0
-            tomato_timer = 0
+            timer = 0
             moveLeft = moveRight = False
             HitSound.stop()
             pygame.mixer.music.play(-1, 0.0, 3000)
