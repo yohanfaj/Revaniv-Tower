@@ -577,7 +577,7 @@ while running:
             WinSound.play()
             displayWinScreen(Win_screen)
             waitForPlayerToPressKey()
-            pygame.music.stop()
+            pygame.mixer.music.stop()
             tomato1moverate = tomato2moverate = tomato3moverate = 0
             timer = t_beer = beer_cooldown = 0
             beer_x = 0
