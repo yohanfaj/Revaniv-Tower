@@ -187,9 +187,11 @@ def beer_x_speed(player_x):
 # waitForPlayerToPressKey() to rec
 displayScreen(scenario)
 StartJingle.play()
+time.sleep(0.5)
 displayScreen(StartScreen)
+time.sleep(0.5)
 displayScreen(tutorial)
-time.sleep(3.5)
+time.sleep(0.5)
 
 musicPlaying = True
 running = True
@@ -477,7 +479,23 @@ while running:
             GameOverSound.play()
             displayScreen(GameOverScreen)
             waitForPlayerToPressKey()
-            terminate()
+            pygame.mixer.music.stop()
+            tomato1moverate = tomato2moverate = tomato3moverate = 0
+            timer = t_beer = beer_cooldown = 0
+            beer_x = 0
+            HEALTH = 3
+            BONUS = 5000
+            bonus_cpt = 0
+            isJump = False
+            beer_launched = False
+            finalscore = 0
+            playerRect.update(0, 541, 25, 49)
+            isJump = False
+            badRect.update(50, 180, 50, 50)
+            tomato1rect.update(50, 190, 15, 15)
+            tomato2rect.update(50, 190, 15, 15)
+            tomato3rect.update(50, 190, 15, 15)
+            beerrect.update(600, 600, 25, 23)
 
         bonus_cpt += 1
         if bonus_cpt > 150:
@@ -524,7 +542,24 @@ while running:
             WinSound.play()
             displayWinScreen(Win_screen)
             waitForPlayerToPressKey()
-            terminate()
+            pygame.music.stop()
+            tomato1moverate = tomato2moverate = tomato3moverate = 0
+            timer = t_beer = beer_cooldown = 0
+            beer_x = 0
+            HEALTH = 3
+            BONUS = 5000
+            bonus_cpt = 0
+            isJump = False
+            beer_launched = False
+            finalscore = 0
+            playerRect.update(0, 541, 25, 49)
+            isJump = False
+            badRect.update(50, 180, 50, 50)
+            tomato1rect.update(50, 190, 15, 15)
+            tomato2rect.update(50, 190, 15, 15)
+            tomato3rect.update(50, 190, 15, 15)
+            beerrect.update(600, 600, 25, 23)
+
 
         redrawScreen()
         mainClock.tick(FPS)
