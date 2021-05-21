@@ -17,7 +17,7 @@ FPS = 60
 PLAYERMOVERATE_X = 4
 PLAYERMOVERATE_Y = 10
 tomato1moverate = tomato2moverate = tomato3moverate = 0
-tomato_timer = 0
+timer = 0
 
 HEALTH = 3
 BONUS = 5000
