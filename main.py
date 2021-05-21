@@ -25,6 +25,7 @@ BONUS = 5000
 bonus_cpt = 0
 isJump = False
 tomato1jump = tomato2jump = tomato3jump = False
+beer_launched = False
 finalscore = 0
 
 # Plateform
@@ -102,6 +103,8 @@ tomato3rect = pygame.Rect(50, 190, 15, 15)
 bg = pygame.image.load("Assets/map_cantine.jpeg")
 potion = pygame.image.load("Assets/potion.png")
 potionrect = pygame.Rect(600,600,17,28)
+beer = pygame.image.load("Assets/beer.png")
+beerrect = pygame.Rect(600,600, 25, 23)
 
 # Set up music.
 StartJingle = pygame.mixer.Sound("Assets/StartJingle.wav")
