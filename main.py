@@ -28,6 +28,7 @@ isJump = False
 tomato1jump = tomato2jump = tomato3jump = False
 beer_launched = False
 finalscore = 0
+death = [0,0]
 
 # Plateform
 P1_X = 0
@@ -80,7 +81,8 @@ class Spritesheet:
 StartScreen = pygame.image.load("Assets/main_menu.png")
 scenario = pygame.image.load("Assets/scenario.png")
 tutorial = pygame.image.load("Assets/tutoriel.png")
-GameOverScreen = pygame.image.load("Assets/game_over_screen.png")
+GameOverScreen1 = pygame.image.load("Assets/game_over_screen1.png")
+GameOverScreen2 = pygame.image.load("Assets/game_over_screen2.png")
 logo = pygame.image.load('Assets/logoicon.ico')
 Win_screen = pygame.image.load("Assets/Win_screen.png")
 
@@ -477,7 +479,10 @@ while running:
         if HEALTH == 0:
             pygame.mixer.music.stop()
             GameOverSound.play()
-            displayScreen(GameOverScreen)
+            if death[0]>death[1]:
+                displayScreen(GameOverScreen1)
+            else:
+                displayScreen(GameOverScreen2)
             waitForPlayerToPressKey()
             pygame.mixer.music.stop()
             tomato1moverate = tomato2moverate = tomato3moverate = 0
@@ -496,6 +501,13 @@ while running:
             tomato2rect.update(50, 190, 15, 15)
             tomato3rect.update(50, 190, 15, 15)
             beerrect.update(600, 600, 25, 23)
+            displayScreen(scenario)
+            StartJingle.play()
+            time.sleep(0.5)
+            displayScreen(StartScreen)
+            time.sleep(0.5)
+            displayScreen(tutorial)
+            time.sleep(0.5)
 
         bonus_cpt += 1
         if bonus_cpt > 150:
@@ -512,7 +524,7 @@ while running:
             BONUS = 0
 
         if playerRect.colliderect(tomato1rect) or playerRect.colliderect(tomato2rect) or playerRect.colliderect(
-                tomato3rect) or playerRect.colliderect(beerrect) or BONUS == 0:
+                tomato3rect) or playerRect.colliderect(beerrect):
             tomato1jump = tomato2jump = tomato3jump = False
             pygame.mixer.music.stop()
             HitSound.play()
@@ -532,6 +544,29 @@ while running:
             pygame.mixer.music.play(-1, 0.0, 3000)
             HEALTH -= 1
             BONUS = 5000
+            death[0]+=1
+
+        if BONUS < 0:
+            tomato1jump = tomato2jump = tomato3jump = False
+            pygame.mixer.music.stop()
+            HitSound.play()
+            waitForPlayerToPressKey()
+            playerRect.update(0, 541, 25, 49)
+            isJump = False
+            badRect.update(50, 180, 50, 50)
+            tomato1rect.update(50, 190, 15, 15)
+            tomato2rect.update(50, 190, 15, 15)
+            tomato3rect.update(50, 190, 15, 15)
+            beer_launched = False
+            beerrect.update(600, 600, 25, 23)
+            tomato1moverate = tomato2moverate = tomato3moverate = 0
+            timer = 0
+            moveLeft = moveRight = False
+            HitSound.stop()
+            pygame.mixer.music.play(-1, 0.0, 3000)
+            HEALTH -= 1
+            BONUS = 5000
+            death[1] += 1
 
         if playerRect.colliderect(badRect):
             moveLeft = moveRight = False
