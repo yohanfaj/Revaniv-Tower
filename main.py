@@ -84,8 +84,10 @@ scenario = pygame.image.load("Assets/scenario.png")
 tutorial = pygame.image.load("Assets/tutoriel.png")
 GameOverScreen1 = pygame.image.load("Assets/game_over_screen1.png")
 GameOverScreen2 = pygame.image.load("Assets/game_over_screen2.png")
-logo = pygame.image.load('Assets/logoicon.ico')
 Win_screen = pygame.image.load("Assets/Win_screen.png")
+
+logo = pygame.image.load('Assets/logo_icon.ico')
+pygame.display.set_icon(logo)
 
 player = pygame.image.load("Assets/core_character_right_1.png")
 player_2 = pygame.image.load("Assets/core_character_left.png")
