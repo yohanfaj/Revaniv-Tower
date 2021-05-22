@@ -3,6 +3,8 @@
 # EFREI PARIS - L1 Int 1 (Team 81) Promo 2025 – Transversal Project L1
 
 # This file contains the entire code of our game.
+# You will find firstly the initialization of some constants & variables and of the assets,
+# then some functions and finally the main loop of the game
 
 
 import pygame, sys, time
@@ -45,6 +47,7 @@ potion_checked = True
 
 finalscore = 0
 death = [0, 0]  # List which will count the 2 ways of loosing: by projectiles or by time.
+
 
 # PLATFORMS INITIALIZATION:
 P1_X = 0
@@ -236,6 +239,10 @@ def initGame():  # Sets up the Start screens of the game:
 
 
 # MAIN LOOP OF THE GAME:
+
+# It contains the movements of the players (horizontal displacement, jumping, platforms),
+# the behaviour of the projectiles and the win / loose events.
+
 
 initGame()
 musicPlaying = True
@@ -596,7 +603,7 @@ while running:
             death[1] += 1
 
 
-        # VICTORY: 
+        # VICTORY:
         if playerRect.colliderect(badRect):
             moveLeft = moveRight = False
             tomato1moverate = tomato2moverate = tomato3moverate = 0
