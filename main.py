@@ -508,12 +508,7 @@ while running:
             beer_launched = False
             potion_checked = True
             finalscore = 0
-            playerRect.update(0, 541, 25, 49)
-            badRect.update(50, 180, 50, 50)
-            tomato1rect.update(50, 190, 15, 15)
-            tomato2rect.update(50, 190, 15, 15)
-            tomato3rect.update(50, 190, 15, 15)
-            beerrect.update(600, 600, 25, 23)
+            updateObjects()
             initGame()
             pygame.mixer.music.play(-1, 0.0, 3000)
 
