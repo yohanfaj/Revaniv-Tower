@@ -1,8 +1,20 @@
-import pygame, sys, time, random
+# REVNANIV'S TOWER - main.py
+# A game developed by Adrien BARBIER, Yohan FAJERMAN, Danny GRAINE, Elouan LARROCHE & Camille SALAUN
+# EFREI PARIS - L1 Int 1 (Team 81) Promo 2025 – Transversal Project L1
+
+# This file contains the entire code of our game.
+
+
+import pygame, sys, time
 from pygame.locals import *
 from random import randint
 
 pygame.mixer.pre_init(44100, -16, 2, 512)
+
+# ------------------------------------------------------------------------------------
+
+
+# CONSTANTS & VARIABLES:
 
 WINDOWWIDTH = 600
 WINDOWHEIGHT = 600
@@ -15,23 +27,26 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 
 FPS = 60
-PLAYERMOVERATE_X = 4
+PLAYERMOVERATE_X = 4  # Movements of the player in "pixels/loop".
 PLAYERMOVERATE_Y = 10
 tomato1moverate = tomato2moverate = tomato3moverate = 0
 timer = t_beer = beer_cooldown = 0
 beer_x = 0
 
-HEALTH = 3
-BONUS = 5000
+HEALTH = 3  # Initial Health of the player
+BONUS = 5000  # Initial score of the player
 bonus_cpt = 0
+
+# Some boolean variables, useful to control the behaviour of some objects:
 isJump = False
 tomato1jump = tomato2jump = tomato3jump = False
 beer_launched = False
 potion_checked = True
-finalscore = 0
-death = [0, 0]
 
-# Plateform
+finalscore = 0
+death = [0, 0]  # List which will count the 2 ways of loosing: by projectiles or by time.
+
+# PLATFORMS INITIALIZATION:
 P1_X = 0
 P1_Y = 590
 P1_LX = 600
@@ -54,7 +69,10 @@ P4_LX = 450
 P4 = pygame.Rect(P4_X, P4_Y, P4_LX, P_Y)
 isOnP4 = False
 
-# Set up pygame, the window, and the mouse cursor.
+# ------------------------------------------------------------------------------------
+
+
+# SET UP OF PYGAME, MOUSE CURSOR & WINDOW:
 pygame.init()
 mainClock = pygame.time.Clock()
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
@@ -65,8 +83,7 @@ pygame.mouse.set_visible(True)
 font = pygame.font.Font('Assets/fette-unz-fraktur.ttf', 30)
 
 
-# Set up images.
-
+# SET UP OF THE SPRITES:
 class Spritesheet:
     def __init__(self, filename):
         self.filename = filename
@@ -79,6 +96,7 @@ class Spritesheet:
         return sprite
 
 
+# The different screens of the game:
 StartScreen = pygame.image.load("Assets/main_menu.png")
 scenario = pygame.image.load("Assets/scenario.png")
 tutorial = pygame.image.load("Assets/tutoriel.png")
@@ -89,6 +107,7 @@ Win_screen = pygame.image.load("Assets/Win_screen.png")
 logo = pygame.image.load('Assets/logo_icon.ico')
 pygame.display.set_icon(logo)
 
+# Sprites of the characters:
 player = pygame.image.load("Assets/core_character_right_1.png")
 player_2 = pygame.image.load("Assets/core_character_left.png")
 run_right_list = [pygame.image.load("Assets/core_character_run_right_1.png"),
@@ -100,6 +119,8 @@ run_right_list = [pygame.image.load("Assets/core_character_run_right_1.png"),
 playerRect = pygame.Rect(0, 541, 25, 49)
 baddie = pygame.image.load(("Assets/skin_sorcier_revaniv.png"))
 badRect = pygame.Rect(50, 180, 50, 50)
+
+# Sprites of the objects:
 tomato1 = pygame.image.load("Assets/tomato.png")
 tomato1rect = pygame.Rect(50, 190, 15, 15)
 tomato2 = pygame.image.load("Assets/tomato.png")
@@ -112,7 +133,7 @@ potionrect = pygame.Rect(600, 600, 17, 28)
 beer = pygame.image.load("Assets/beer.png")
 beerrect = pygame.Rect(600, 600, 25, 23)
 
-# Set up music.
+# SET UP OF THE MUSIC:
 StartJingle = pygame.mixer.Sound("Assets/StartJingle.wav")
 pygame.mixer.music.load('Assets/background.wav')
 HitSound = pygame.mixer.Sound('Assets/hit_sound.wav')
@@ -122,14 +143,17 @@ WinSound = pygame.mixer.Sound("Assets/win_sound.mp3")
 potionSound = pygame.mixer.Sound("Assets/potion.mp3")
 
 
-# Functions:
+# ------------------------------------------------------------------------------------
 
-def terminate():
+
+# FUNCTIONS:
+
+def terminate():  # Shut down the game & close the window.
     pygame.quit()
     sys.exit()
 
 
-def waitForPlayerToPressKey():
+def waitForPlayerToPressKey():  # Locks the screen until the player press a key.
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -140,7 +164,7 @@ def waitForPlayerToPressKey():
                 return
 
 
-def redrawScreen():
+def redrawScreen():  # Update the screen, including by redrawing the sprites & the texts.
     windowSurface.blit(bg, (0, 0))
     windowSurface.blit(player, playerRect)
     windowSurface.blit(baddie, badRect)
@@ -159,17 +183,17 @@ def redrawScreen():
     windowSurface.fill(WHITE)
 
 
-def y_trajectory(y_basis, y_speed, t):
+def y_trajectory(y_basis, y_speed, t):  # Calculates the vertical trajectory of the object.
     y = y_basis - ((-9.81 / 30) * (t ** 2) / 2 + y_speed * t)
     return y
 
 
-def beer_x_speed(player_x):
+def beer_x_speed(player_x):  # Calculates the horizontal velocity of the beer projectile.
     x_speed = (player_x - 60) / 64
     return x_speed
 
 
-def drawText(text, font, surface, color, x, y):
+def drawText(text, font, surface, color, x, y):  # Displays texts on the screen.
     textobj = font.render(text, 1, color)
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
@@ -189,7 +213,7 @@ def displayWinScreen(x):
     waitForPlayerToPressKey()
 
 
-def updateObjects():
+def updateObjects():  # Re-initializes the positions of the objects after an event (win / loose).
     playerRect.update(0, 541, 25, 49)
     badRect.update(50, 180, 50, 50)
     tomato1rect.update(50, 190, 15, 15)
@@ -198,7 +222,7 @@ def updateObjects():
     beerrect.update(600, 600, 25, 23)
 
 
-def initGame():  # Set up the Start screen of the game:
+def initGame():  # Sets up the Start screens of the game:
     displayScreen(scenario)
     StartJingle.play()
     time.sleep(0.5)
@@ -207,6 +231,11 @@ def initGame():  # Set up the Start screen of the game:
     displayScreen(tutorial)
     time.sleep(0.5)
 
+
+# ------------------------------------------------------------------------------------
+
+
+# MAIN LOOP OF THE GAME:
 
 initGame()
 musicPlaying = True
@@ -218,21 +247,30 @@ while running:
     pygame.mixer.music.play(-1, 0.0, 3000)
 
     while True:
+
+        # GETS & PERFORMS AN ACTION FOR EACH PYGAME EVENT OCCURRING:
+
         for event in pygame.event.get():
             if event.type == QUIT:
+                # Closes the game
                 running = False
                 terminate()
 
-            if event.type == KEYDOWN:
+            if event.type == KEYDOWN:  # Gets & performs an action for each key pressed DOWN:
+
                 if event.key == K_LEFT or event.key == K_a:
+                    # Left key = left movement
                     moveRight = False
                     moveLeft = True
                     player = pygame.image.load("Assets/core_character_run_left.png")
                 if event.key == K_RIGHT or event.key == K_d:
+                    # Right key = right movement
                     moveLeft = False
                     moveRight = True
                     player = run_right_list[0]
+
                 if event.key == K_SPACE and isJump == False:
+                    # Space bar = Jump
                     if event.key == K_LEFT or event.key == K_a:
                         player = pygame.image.load("Assets/core_character_jump_left.png")
                     elif event.key == K_RIGHT or event.key == K_d:
@@ -242,21 +280,9 @@ while running:
                     y_basis = playerRect.y
                     y_speed = PLAYERMOVERATE_Y
 
-                    # OLD VERSION :
-                    # y_basis = playerRect.y
-                    # t = 0
-                    # playerRect.y = y_trajectory(y_basis, PLAYERMOVERATE_Y, t)
-                    # t += 1
-
-            # if isJump and playerRect.y < 500:
-            # playerRect.y = y_trajectory(y_basis, PLAYERMOVERATE_Y, t)
-            # t += 1
-            # if isJump and playerRect.y > 500:
-            # isJump = False
-            # playerRect.y = 480
-
-            if event.type == KEYUP:
+            if event.type == KEYUP:  # Gets & performs an action for each key pressed UP:
                 if event.key == K_ESCAPE:
+                    # ESC = shuts down the game
                     running = False
                     terminate()
 
@@ -268,26 +294,22 @@ while running:
                     player = pygame.image.load("Assets/core_character_right_1.png")
 
                 if event.key == K_m:
+                    # M key = mutes the background music
                     if musicPlaying:
                         pygame.mixer.music.stop()
                     else:
                         pygame.mixer.music.play(-1, 0.0)
                     musicPlaying = not musicPlaying
 
-        # Move the player around.
+        # --------------------------------------
+
+        # PLAYER'S MOVEMENTS:
         if moveLeft and playerRect.left > 0:
             playerRect.left -= PLAYERMOVERATE_X
         if moveRight and playerRect.right < WINDOWWIDTH:
             playerRect.right += PLAYERMOVERATE_X
 
-        # if isJump is True:
-        #    playerRect.y -= PLAYERMOVERATE_Y * 2
-        #    PLAYERMOVERATE_Y -= 1
-        #    if PLAYERMOVERATE_Y < -10:
-        #        isJump = False
-        #        PLAYERMOVERATE_Y = 10
-
-        # Jump mechanics
+        # JUMPING MECHANICS & COLLISIONS WITH PLATFORMS:
         if isJump:
             playerRect.y = y_trajectory(y_basis, y_speed, t)
             t += 1
@@ -368,6 +390,10 @@ while running:
             y_basis = playerRect.y
             t = 0
 
+
+        # --------------------------------------
+
+        # MECHANICS OF THE BEER PROJECTILE:
         if (not beer_launched) and playerRect.y < P4_Y and beer_cooldown == 0:
             beerrect.x = 60
             beerrect.y = 180
@@ -391,13 +417,9 @@ while running:
         if not (beer_launched) and beer_cooldown > 0:
             beer_cooldown -= 1
 
-        # if badLeft and badRect.left > 0:
-        # badRight = False
-        # badRect.left -= BADDIEMOVERATE
-        # if badRight and badRect.right < WINDOWWIDTH:
-        # badLeft = False
-        # badRect.right += BADDIEMOVERATE
+        # --------------------------------------
 
+        # MECHANICS OF THE TOMATOES PROJECTILE:
         tomato1rect.x += tomato1moverate
         if (not (585 >= tomato1rect.x >= 0) and tomato1rect.y < 550) or (tomato1rect.y > 550 and tomato1rect.x >= 585):
             tomato1rect.x -= tomato1moverate
@@ -452,6 +474,8 @@ while running:
             tomato3rect.y = y_trajectory(tomato3_y_basis, 0, t_tomato3)
             t_tomato3 += 1
 
+
+        # Timing tomatoes' movement + potion's appearance:
         timer += 1
 
         if timer == 60:
@@ -467,6 +491,7 @@ while running:
             potionrect.x = 600
             potionrect.y = 600
 
+        # When the player takes the potion:
         if playerRect.colliderect(potionrect) and potion_checked == True:
             potionSound.play()
             potionrect.x = 600
@@ -491,13 +516,30 @@ while running:
             tomato3moverate = -tomato3moverate
 
 
+        # --------------------------------------
+
+        # LOOSES & WINS EVENTS:
+
+        # Time Score's functioning:
+        bonus_cpt += 1
+        if bonus_cpt > 150:
+            BONUS -= 100
+            bonus_cpt = 0
+        if BONUS == 1000:  # Warning when time is running out:
+            pygame.mixer.music.stop()
+            TimeRun.set_volume(0.5)
+            TimeRun.play()
+            pygame.mixer.music.play(-1, 0.0, 3000)
+
+
+        # GAME OVER:
         if HEALTH == 0:
             pygame.mixer.music.stop()
             GameOverSound.play()
             if death[0] > death[1]:
-                displayScreen(GameOverScreen1)
+                displayScreen(GameOverScreen1)  # Death by projectiles
             else:
-                displayScreen(GameOverScreen2)
+                displayScreen(GameOverScreen2)  # Death by time
             waitForPlayerToPressKey()
             pygame.mixer.music.stop()
             tomato1moverate = tomato2moverate = tomato3moverate = 0
@@ -514,17 +556,8 @@ while running:
             initGame()
             pygame.mixer.music.play(-1, 0.0, 3000)
 
-        bonus_cpt += 1
-        if bonus_cpt > 150:
-            BONUS -= 100
-            bonus_cpt = 0
-        if BONUS == 1000:
-            pygame.mixer.music.stop()
-            TimeRun.set_volume(0.5)
-            TimeRun.play()
-            pygame.mixer.music.play(-1, 0.0, 3000)
 
-
+        # HIT BY PROJECTILES:
         if playerRect.colliderect(tomato1rect) or playerRect.colliderect(tomato2rect) or playerRect.colliderect(
                 tomato3rect) or playerRect.colliderect(beerrect):
             tomato1jump = tomato2jump = tomato3jump = False
@@ -544,6 +577,7 @@ while running:
             death[0] += 1
 
 
+        # ELAPSED TIME:
         if BONUS == -100:
             tomato1jump = tomato2jump = tomato3jump = False
             pygame.mixer.music.stop()
@@ -561,6 +595,8 @@ while running:
             BONUS = 5000
             death[1] += 1
 
+
+        # VICTORY: 
         if playerRect.colliderect(badRect):
             moveLeft = moveRight = False
             tomato1moverate = tomato2moverate = tomato3moverate = 0
