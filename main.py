@@ -27,8 +27,9 @@ bonus_cpt = 0
 isJump = False
 tomato1jump = tomato2jump = tomato3jump = False
 beer_launched = False
+potion_checked = True
 finalscore = 0
-death = [0,0]
+death = [0, 0]
 
 # Plateform
 P1_X = 0
@@ -105,9 +106,9 @@ tomato3 = pygame.image.load("Assets/tomato.png")
 tomato3rect = pygame.Rect(50, 190, 15, 15)
 bg = pygame.image.load("Assets/map_cantine.jpeg")
 potion = pygame.image.load("Assets/potion.png")
-potionrect = pygame.Rect(600,600,17,28)
+potionrect = pygame.Rect(600, 600, 17, 28)
 beer = pygame.image.load("Assets/beer.png")
-beerrect = pygame.Rect(600,600, 25, 23)
+beerrect = pygame.Rect(600, 600, 25, 23)
 
 # Set up music.
 StartJingle = pygame.mixer.Sound("Assets/StartJingle.wav")
@@ -161,12 +162,16 @@ def y_trajectory(y_basis, y_speed, t):
     return y
 
 
+def beer_x_speed(player_x):
+    x_speed = (player_x - 60) / 64
+    return x_speed
+
+
 def drawText(text, font, surface, color, x, y):
     textobj = font.render(text, 1, color)
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
-
 
 
 def displayScreen(x):
@@ -177,24 +182,22 @@ def displayScreen(x):
 
 def displayWinScreen(x):
     windowSurface.blit(x, (0, 0))
-    drawText("%s" %(finalscore), font, windowSurface, WHITE, 335, 110)
+    drawText("%s" % (finalscore), font, windowSurface, WHITE, 335, 110)
     pygame.display.update()
     waitForPlayerToPressKey()
 
-def beer_x_speed(player_x):
-    x_speed = (player_x-60)/64
-    return x_speed
 
-# Set up the Start screen of the game:
-# waitForPlayerToPressKey() to rec
-displayScreen(scenario)
-StartJingle.play()
-time.sleep(0.5)
-displayScreen(StartScreen)
-time.sleep(0.5)
-displayScreen(tutorial)
-time.sleep(0.5)
+def initGame():  # Set up the Start screen of the game:
+    displayScreen(scenario)
+    StartJingle.play()
+    time.sleep(0.5)
+    displayScreen(StartScreen)
+    time.sleep(0.5)
+    displayScreen(tutorial)
+    time.sleep(0.5)
 
+
+initGame()
 musicPlaying = True
 running = True
 
@@ -354,14 +357,14 @@ while running:
             y_basis = playerRect.y
             t = 0
 
-        if (not beer_launched) and playerRect.y < P4_Y and beer_cooldown==0:
+        if (not beer_launched) and playerRect.y < P4_Y and beer_cooldown == 0:
             beerrect.x = 60
             beerrect.y = 180
             beer_x = beer_x_speed(playerRect.x)
             beer_launched = True
             t_beer = 0
 
-        if beer_launched and not(0 < beerrect.x < 575):
+        if beer_launched and not (0 < beerrect.x < 575):
             beer_x = -beer_x
 
         if beer_launched and (beerrect.colliderect(P3) or beerrect.colliderect(P4)):
@@ -374,9 +377,8 @@ while running:
             beerrect.y = y_trajectory(180, 10, t_beer)
             beerrect.x += beer_x
             t_beer += 1
-        if not(beer_launched) and beer_cooldown>0:
-            beer_cooldown-=1
-
+        if not (beer_launched) and beer_cooldown > 0:
+            beer_cooldown -= 1
 
         # if badLeft and badRect.left > 0:
         # badRight = False
@@ -447,39 +449,41 @@ while running:
             tomato2moverate = 4
         if timer == 460:
             tomato3moverate = 4
-        if timer == 700:
-            potionrect.x = randint(50,420)
+        if timer == 700 and potion_checked == True:
+            potionrect.x = randint(50, 420)
             potionrect.y = 440
-        if timer < 700:
+        if timer < 700 and potion_checked == True:
             potionrect.x = 600
             potionrect.y = 600
 
-        if playerRect.colliderect(potionrect):
+        if playerRect.colliderect(potionrect) and potion_checked == True:
             potionSound.play()
             potionrect.x = 600
             potionrect.y = 600
             HEALTH += 1
+            potion_checked = False
 
-        if (tomato1rect.y > 500 and tomato1rect.x < -15):
+        if tomato1rect.y > 500 and tomato1rect.x < -15:
             tomato1rect.x = 50
             tomato1rect.y = 190
             tomato1jump = False
             tomato1moverate = -tomato1moverate
-        if (tomato2rect.y > 500 and tomato2rect.x < -15):
+        if tomato2rect.y > 500 and tomato2rect.x < -15:
             tomato2rect.x = 50
             tomato2rect.y = 190
             tomato2jump = False
             tomato2moverate = -tomato2moverate
-        if (tomato3rect.y > 500 and tomato3rect.x < -15):
+        if tomato3rect.y > 500 and tomato3rect.x < -15:
             tomato3rect.x = 50
             tomato3rect.y = 190
             tomato3jump = False
             tomato3moverate = -tomato3moverate
 
+
         if HEALTH == 0:
             pygame.mixer.music.stop()
             GameOverSound.play()
-            if death[0]>death[1]:
+            if death[0] > death[1]:
                 displayScreen(GameOverScreen1)
             else:
                 displayScreen(GameOverScreen2)
@@ -493,21 +497,16 @@ while running:
             bonus_cpt = 0
             isJump = False
             beer_launched = False
+            potion_checked = True
             finalscore = 0
             playerRect.update(0, 541, 25, 49)
-            isJump = False
             badRect.update(50, 180, 50, 50)
             tomato1rect.update(50, 190, 15, 15)
             tomato2rect.update(50, 190, 15, 15)
             tomato3rect.update(50, 190, 15, 15)
             beerrect.update(600, 600, 25, 23)
-            displayScreen(scenario)
-            StartJingle.play()
-            time.sleep(0.5)
-            displayScreen(StartScreen)
-            time.sleep(0.5)
-            displayScreen(tutorial)
-            time.sleep(0.5)
+            initGame()
+            pygame.mixer.music.play(-1, 0.0, 3000)
 
         bonus_cpt += 1
         if bonus_cpt > 150:
@@ -518,8 +517,7 @@ while running:
             TimeRun.set_volume(0.5)
             TimeRun.play()
             pygame.mixer.music.play(-1, 0.0, 3000)
-        #while BONUS <= 1000:
-            #drawText("Time Score: %s" % (BONUS), font, windowSurface, RED, 10, 45)
+
 
         if playerRect.colliderect(tomato1rect) or playerRect.colliderect(tomato2rect) or playerRect.colliderect(
                 tomato3rect) or playerRect.colliderect(beerrect):
@@ -534,7 +532,7 @@ while running:
             tomato2rect.update(50, 190, 15, 15)
             tomato3rect.update(50, 190, 15, 15)
             beer_launched = False
-            beerrect.update(600,600,25, 23)
+            beerrect.update(600, 600, 25, 23)
             tomato1moverate = tomato2moverate = tomato3moverate = 0
             timer = 0
             moveLeft = moveRight = False
@@ -542,7 +540,8 @@ while running:
             pygame.mixer.music.play(-1, 0.0, 3000)
             HEALTH -= 1
             BONUS = 5000
-            death[0]+=1
+            death[0] += 1
+
 
         if BONUS == -100:
             tomato1jump = tomato2jump = tomato3jump = False
@@ -570,7 +569,7 @@ while running:
             moveLeft = moveRight = False
             tomato1moverate = tomato2moverate = tomato3moverate = 0
             tomato1jump = tomato2jump = tomato3jump = False
-            finalscore = BONUS + 1000*HEALTH
+            finalscore = BONUS + 1000 * HEALTH
             pygame.mixer.music.stop()
             WinSound.play()
             displayWinScreen(Win_screen)
@@ -584,15 +583,16 @@ while running:
             bonus_cpt = 0
             isJump = False
             beer_launched = False
+            potion_checked = True
             finalscore = 0
             playerRect.update(0, 541, 25, 49)
-            isJump = False
             badRect.update(50, 180, 50, 50)
             tomato1rect.update(50, 190, 15, 15)
             tomato2rect.update(50, 190, 15, 15)
             tomato3rect.update(50, 190, 15, 15)
             beerrect.update(600, 600, 25, 23)
-
+            initGame()
+            pygame.mixer.music.play(-1, 0.0, 3000)
 
         redrawScreen()
         mainClock.tick(FPS)
